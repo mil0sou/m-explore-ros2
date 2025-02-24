@@ -157,7 +157,7 @@
      }
    }
    exploring_timer_ = this->create_wall_timer(
-       std::chrono::milliseconds((uint16_t)(1000.0 / planner_frequency_)),
+       std::chrono::milliseconds((uint16_t)(500.0 / planner_frequency_)),
        [this]() { makePlan(); });
    // Start exploration right away
    makePlan();
@@ -196,7 +196,7 @@
    green.b = 0;
    green.a = 1.0;
  
-   RCLCPP_DEBUG(logger_, "visualising %lu frontiers", frontiers.size());
+   RCLCPP_INFO(logger_, "visualising %lu frontiers", frontiers.size());
    visualization_msgs::msg::MarkerArray markers_msg;
    std::vector<visualization_msgs::msg::Marker>& markers = markers_msg.markers;
    visualization_msgs::msg::Marker m;
@@ -271,13 +271,15 @@
  
  void Explore::makePlan()
  {
+    RCLCPP_INFO(logger_, "MILO TEST MAKEPLAN ");
+
    // find frontiers
    auto pose = costmap_client_.getRobotPose();
    // get frontiers sorted according to cost
    auto frontiers = search_.searchFrom(pose.position);
-   RCLCPP_DEBUG(logger_, "found %lu frontiers", frontiers.size());
+   RCLCPP_INFO(logger_, "found %lu frontiers", frontiers.size());
    for (size_t i = 0; i < frontiers.size(); ++i) {
-     RCLCPP_DEBUG(logger_, "frontier %zd cost: %f", i, frontiers[i].cost);
+    RCLCPP_DEBUG(logger_, "frontier %zd cost: %f", i, frontiers[i].cost);
    }
  
    if (frontiers.empty()) {
@@ -317,7 +319,7 @@
    if ((this->now() - last_progress_ >
        tf2::durationFromSec(progress_timeout_)) && !resuming_) {
      frontier_blacklist_.push_back(target_position);
-     RCLCPP_DEBUG(logger_, "Adding current goal to black list");
+     RCLCPP_INFO(logger_, "Adding current goal to black list");
      makePlan();
      return;
    }
@@ -332,7 +334,7 @@
      return;
    }
  
-   RCLCPP_DEBUG(logger_, "Sending goal to move base nav2");
+   RCLCPP_INFO(logger_, "Sending goal to move base nav2");
  
    // send goal to move_base if we have something new to pursue
    auto goal = nav2_msgs::action::NavigateToPose::Goal();
@@ -360,7 +362,7 @@
    RCLCPP_INFO(logger_, "Returning to initial pose.");
    auto goal = nav2_msgs::action::NavigateToPose::Goal();
    goal.pose.pose.position = initial_pose_.position;
-   goal.pose.pose.orientation = initial_pose_.orientation;
+   //goal.pose.pose.orientation = initial_pose_.orientation;
    goal.pose.header.frame_id = costmap_client_.getGlobalFrameID();
    goal.pose.header.stamp = this->now();
  
@@ -391,17 +393,17 @@
  {
    switch (result.code) {
      case rclcpp_action::ResultCode::SUCCEEDED:
-       RCLCPP_DEBUG(logger_, "Goal was successful");
+       RCLCPP_INFO(logger_, "Goal was successful");
        break;
      case rclcpp_action::ResultCode::ABORTED:
-       RCLCPP_DEBUG(logger_, "Goal was aborted");
+       RCLCPP_INFO(logger_, "Goal was aborted");
        frontier_blacklist_.push_back(frontier_goal);
-       RCLCPP_DEBUG(logger_, "Adding current goal to black list");
+       RCLCPP_INFO(logger_, "Adding current goal to black list");
        // If it was aborted probably because we've found another frontier goal,
        // so just return and don't make plan again
        return;
      case rclcpp_action::ResultCode::CANCELED:
-       RCLCPP_DEBUG(logger_, "Goal was canceled");
+       RCLCPP_INFO(logger_, "Goal was canceled");
        // If goal canceled might be because exploration stopped from topic. Don't make new plan.
        return;
      default:

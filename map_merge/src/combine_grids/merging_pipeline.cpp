@@ -70,7 +70,7 @@ bool MergingPipeline::estimateTransforms(FeatureType feature_type,
 
   /* find features in images */
   static rclcpp::Logger logger = rclcpp::get_logger("estimateTransforms");
-  RCLCPP_DEBUG(logger, "computing features");
+  RCLCPP_INFO(logger, "computing features");
   image_features.reserve(images_.size());
   for (const cv::Mat& image : images_) {
     image_features.emplace_back();
@@ -85,7 +85,7 @@ bool MergingPipeline::estimateTransforms(FeatureType feature_type,
   finder = {};
 
   /* find corespondent features */
-  RCLCPP_DEBUG(logger, "pairwise matching features");
+  RCLCPP_INFO(logger, "pairwise matching features");
   (*matcher)(image_features, pairwise_matches);
   matcher = {};
 
@@ -142,7 +142,7 @@ bool MergingPipeline::estimateTransforms(FeatureType feature_type,
 
 
   /* estimate transform */
-  RCLCPP_DEBUG(logger, "calculating transforms in global reference frame");
+  RCLCPP_INFO(logger, "calculating transforms in global reference frame");
   // note: currently used estimator never fails
   if (!(*estimator)(image_features, pairwise_matches, transforms)) {
     return false;
@@ -153,7 +153,7 @@ bool MergingPipeline::estimateTransforms(FeatureType feature_type,
   for (auto& transform : transforms) {
     transform.R.convertTo(transform.R, CV_32F);
   }
-  RCLCPP_DEBUG(logger, "optimizing global transforms");
+  RCLCPP_INFO(logger, "optimizing global transforms");
   adjuster->setConfThresh(confidence);
   if (!(*adjuster)(image_features, pairwise_matches, transforms)) {
     RCLCPP_WARN(logger, "Bundle adjusting failed. Could not estimate transforms.");
@@ -193,7 +193,7 @@ nav_msgs::msg::OccupancyGrid::SharedPtr MergingPipeline::composeGrids()
     return nullptr;
   }
 
-  RCLCPP_DEBUG(logger, "warping grids");
+  RCLCPP_INFO(logger, "warping grids");
   internal::GridWarper warper;
   std::vector<cv::Mat> imgs_warped;
   imgs_warped.reserve(images_.size());
@@ -212,7 +212,7 @@ nav_msgs::msg::OccupancyGrid::SharedPtr MergingPipeline::composeGrids()
     return nullptr;
   }
 
-  RCLCPP_DEBUG(logger, "compositing result grid");
+  RCLCPP_INFO(logger, "compositing result grid");
   nav_msgs::msg::OccupancyGrid::SharedPtr result;
   internal::GridCompositor compositor;
   result = compositor.compose(imgs_warped, rois);

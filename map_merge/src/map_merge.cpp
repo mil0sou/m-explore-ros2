@@ -118,7 +118,7 @@ subscriptions_size_(0)
  */
 void MapMerge::topicSubscribing()
 {
-  RCLCPP_DEBUG(logger_, "Robot discovery started.");
+  RCLCPP_INFO(logger_, "Robot discovery started.");
   RCLCPP_INFO_ONCE(logger_, "Robot discovery started.");
 
   // ros::master::V_TopicInfo topic_infos;
@@ -200,7 +200,7 @@ void MapMerge::topicSubscribing()
  */
 void MapMerge::mapMerging()
 {
-  RCLCPP_DEBUG(logger_, "Map merging started.");
+  RCLCPP_INFO(logger_, "Map merging started.");
   RCLCPP_INFO_ONCE(logger_, "Map merging started.");
 
   if (have_initial_poses_) {
@@ -238,7 +238,7 @@ void MapMerge::mapMerging()
     return;
   }
 
-  RCLCPP_DEBUG(logger_, "all maps merged, publishing");
+  RCLCPP_INFO(logger_, "all maps merged, publishing");
   // RCLCPP_INFO(logger_, "all maps merged, publishing");
   auto now = this->now();
   merged_map->info.map_load_time = now;
@@ -251,7 +251,7 @@ void MapMerge::mapMerging()
 
 void MapMerge::poseEstimation()
 {
-  RCLCPP_DEBUG(logger_, "Grid pose estimation started.");
+  RCLCPP_INFO(logger_, "Grid pose estimation started.");
   RCLCPP_INFO_ONCE(logger_, "Grid pose estimation started.");
   std::vector<nav_msgs::msg::OccupancyGrid::ConstSharedPtr> grids;
   grids.reserve(subscriptions_size_);
@@ -287,7 +287,7 @@ void MapMerge::poseEstimation()
 void MapMerge::fullMapUpdate(const nav_msgs::msg::OccupancyGrid::SharedPtr msg,
                      MapSubscription& subscription)
 {
-  RCLCPP_DEBUG(logger_, "received full map update");
+  RCLCPP_INFO(logger_, "received full map update");
   // RCLCPP_INFO(logger_, "received full map update");
   std::lock_guard<std::mutex> lock(subscription.mutex);
   if (subscription.readonly_map){
@@ -310,7 +310,7 @@ void MapMerge::fullMapUpdate(const nav_msgs::msg::OccupancyGrid::SharedPtr msg,
 void MapMerge::partialMapUpdate(const map_msgs::msg::OccupancyGridUpdate::SharedPtr msg,
                         MapSubscription& subscription)
 {
-  RCLCPP_DEBUG(logger_, "received partial map update");
+  RCLCPP_INFO(logger_, "received partial map update");
 
   if (msg->x < 0 || msg->y < 0) {
     RCLCPP_ERROR(logger_, "negative coordinates, invalid update. x: %d, y: %d", msg->x,

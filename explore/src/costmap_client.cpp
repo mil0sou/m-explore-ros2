@@ -175,11 +175,11 @@ void Costmap2DClient::updateFullMap(
 void Costmap2DClient::updatePartialMap(
     const map_msgs::msg::OccupancyGridUpdate::SharedPtr msg)
 {
-  RCLCPP_DEBUG(node_.get_logger(), "received partial map update");
+  RCLCPP_INFO(node_.get_logger(), "received partial map update");
   global_frame_ = msg->header.frame_id;
 
   if (msg->x < 0 || msg->y < 0) {
-    RCLCPP_DEBUG(node_.get_logger(),
+    RCLCPP_INFO(node_.get_logger(),
                  "negative coordinates, invalid update. x: %d, y: %d", msg->x,
                  msg->y);
     return;
