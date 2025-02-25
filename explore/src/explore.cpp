@@ -271,7 +271,7 @@
  
  void Explore::makePlan()
  {
-    RCLCPP_INFO(logger_, "MILO TEST MAKEPLAN ");
+    RCLCPP_INFO(logger_, "\nMILO TEST MAKEPLAN ");
 
    // find frontiers
    auto pose = costmap_client_.getRobotPose();
@@ -342,7 +342,7 @@
    goal.pose.pose.orientation.w = 1.;
    goal.pose.header.frame_id = costmap_client_.getGlobalFrameID();
    goal.pose.header.stamp = this->now();
- 
+   RCLCPP_INFO(logger_, "New goal: x = %f, y = %f", target_position.x, target_position.y);
    auto send_goal_options =
        rclcpp_action::Client<nav2_msgs::action::NavigateToPose>::SendGoalOptions();
    // send_goal_options.goal_response_callback =
