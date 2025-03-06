@@ -39,7 +39,9 @@
  #include <explore/explore.h>
  #include "rclcpp/time.hpp"  // Assure-toi que cette bibliothèque est incluse
  #include "rclcpp/rclcpp.hpp"
- 
+#include "std_msgs/msg/string.hpp"
+#include <string>
+
  #include <thread>
  
  inline static bool same_point(const geometry_msgs::msg::Point& one,
@@ -65,12 +67,12 @@
    double min_frontier_size;
    this->declare_parameter<float>("planner_frequency", 1.0);
    this->declare_parameter<float>("progress_timeout", 100000.0);
-   this->declare_parameter<bool>("visualize", false);
+   this->declare_parameter<bool>("visualize", true);
    this->declare_parameter<float>("potential_scale", 1e-3);
    this->declare_parameter<float>("orientation_scale", 0.0);
    this->declare_parameter<float>("gain_scale", 1.0);
-   this->declare_parameter<float>("min_frontier_size", 2.5);
-   this->declare_parameter<bool>("return_to_init", false);
+   this->declare_parameter<float>("min_frontier_size", 1.5);
+   this->declare_parameter<bool>("return_to_init", true);
  
    this->get_parameter("planner_frequency", planner_frequency_);
    this->get_parameter("progress_timeout", timeout);
@@ -98,12 +100,21 @@
                                                                       "s",
                                                                       10);
    }
- 
+  // Publisher to publish strings to the "milopose" topic
+  milopose_publisher_ = this->create_publisher<std_msgs::msg::String>("milopose", 10);
+
+  // Publier un message initial pour s'assurer que le topic est visible
+  std_msgs::msg::String initial_msg;
+  initial_msg.data = "Initial message";
+  milopose_publisher_->publish(initial_msg);
+  RCLCPP_INFO(logger_, "Published initial message on milopose: %s", initial_msg.data.c_str());
+
    // Subscription to resume or stop exploration
    resume_subscription_ = this->create_subscription<std_msgs::msg::Bool>(
        "explore/resume", 10,
        std::bind(&Explore::resumeCallback, this, std::placeholders::_1));
- 
+    
+      
    RCLCPP_INFO(logger_, "Waiting to connect to move_base nav2 server");
    move_base_client_->wait_for_action_server();
    RCLCPP_INFO(logger_, "Connected to move_base nav2 server");
@@ -153,7 +164,7 @@
      } catch (tf2::TransformException& ex) {
          RCLCPP_ERROR(logger_, "Couldn't find transform from %s to %s: %s",
                       map_frame.c_str(), robot_base_frame_.c_str(), ex.what());
-         return_to_init_ = false;
+         return_to_init_ = true;
      }
    }
    exploring_timer_ = this->create_wall_timer(
@@ -439,6 +450,14 @@
          reachedGoal(result, target_position);
      };
      move_base_client_->async_send_goal(goal, send_goal_options);
+     RCLCPP_INFO(logger_, "Goal sent: x = %f, y = %f",goal.pose.pose.position.x, goal.pose.pose.position.y);
+      // Publish the target position to the "milopose" topic
+      std_msgs::msg::String milopose_msg;
+      std::stringstream stream;
+      stream << std::fixed << std::setprecision(2) << goal.pose.pose.position.x << ";" << goal.pose.pose.position.y;
+      milopose_msg.data = stream.str();
+      milopose_publisher_->publish(milopose_msg);
+      RCLCPP_INFO(logger_, "Published milopose: %s", milopose_msg.data.c_str());
  }
 
 
@@ -454,7 +473,15 @@
    auto send_goal_options =
        rclcpp_action::Client<nav2_msgs::action::NavigateToPose>::SendGoalOptions();
    move_base_client_->async_send_goal(goal, send_goal_options);
- }
+   RCLCPP_INFO(logger_, "Returning to initial pose: x = %f, y = %f", goal.pose.pose.position.x, goal.pose.pose.position.y);
+    // Publish the target position to the "milopose" topic
+    std_msgs::msg::String milopose_msg;
+    std::stringstream stream;
+    stream << std::fixed << std::setprecision(2) << goal.pose.pose.position.x << ";" << goal.pose.pose.position.y;
+    milopose_msg.data = stream.str();
+    milopose_publisher_->publish(milopose_msg);
+    RCLCPP_INFO(logger_, "Published milopose: %s", milopose_msg.data.c_str());
+  }
  
  bool Explore::goalOnBlacklist(const geometry_msgs::msg::Point& goal)
  {
@@ -550,4 +577,3 @@
    rclcpp::shutdown();
    return 0;
  }
- 

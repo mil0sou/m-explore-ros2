@@ -51,6 +51,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/bool.hpp>
 #include <std_msgs/msg/color_rgba.hpp>
+#include "std_msgs/msg/string.hpp"
 #include <string>
 #include <vector>
 #include <visualization_msgs/msg/marker_array.hpp>
@@ -109,6 +110,7 @@ private:
 
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr
       marker_array_publisher_;
+  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr milopose_publisher_;
   rclcpp::Logger logger_ = rclcpp::get_logger("ExploreNode");
   tf2_ros::Buffer tf_buffer_;
   tf2_ros::TransformListener tf_listener_;
