@@ -1,4 +1,13 @@
 # m-explore ROS2 port
+## 7 mars 2025
+
+fork depuis[robo-friends](https://github.com/robo-friends/m-explore-ros2)
+modifié pour la simulation de l'exploration autonome d'un robot à 4 roues motrices
+
+mso@pilgrim-technology.com  
+milosoulardgeii@gmail.com  
+
+---
 
 ROS2 package port for multi-robot autonomous exploration of [m-explore](https://github.com/hrnr/m-explore). Currently tested on Eloquent, Dashing, Foxy, and Galactic distros.
 
