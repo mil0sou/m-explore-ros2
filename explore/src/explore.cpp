@@ -388,6 +388,8 @@
      if (frontiers.empty()) {
          RCLCPP_WARN(logger_, "No frontiers found, stopping.");
          stop(true);
+         rclcpp::shutdown();
+         exit(0);
          return;
      }
  
