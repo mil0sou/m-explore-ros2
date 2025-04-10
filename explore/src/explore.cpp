@@ -68,10 +68,17 @@
    this->declare_parameter<float>("planner_frequency", 1.0);
    this->declare_parameter<float>("progress_timeout", 100000.0);
    this->declare_parameter<bool>("visualize", true);
-   this->declare_parameter<float>("potential_scale", 1e-3);
-   this->declare_parameter<float>("orientation_scale", 0.0);
-   this->declare_parameter<float>("gain_scale", 1.0);
-   this->declare_parameter<float>("min_frontier_size", 1.0);  //à modifier 
+
+  //  this->declare_parameter<float>("potential_scale", 1e-3);
+  //  this->declare_parameter<float>("orientation_scale", 0.0);
+  //  this->declare_parameter<float>("gain_scale", 1.0);
+   
+    this->declare_parameter<float>("potential_scale", 0.3);
+    this->declare_parameter<float>("orientation_scale", 1.5);
+    this->declare_parameter<float>("gain_scale", 50.0);
+  
+  
+   this->declare_parameter<float>("min_frontier_size", 7.0);  //à modifier 
    this->declare_parameter<bool>("return_to_init", true);
  
    this->get_parameter("planner_frequency", planner_frequency_);
@@ -399,13 +406,20 @@
      }
  
      // sort frontiers by distance to the current position
-     std::sort(frontiers.begin(), frontiers.end(),
+     /*std::sort(frontiers.begin(), frontiers.end(),
                [&pose](const frontier_exploration::Frontier& a, const frontier_exploration::Frontier& b) {
                    double dist_a = std::hypot(a.centroid.x - pose.position.x, a.centroid.y - pose.position.y);
                    double dist_b = std::hypot(b.centroid.x - pose.position.x, b.centroid.y - pose.position.y);
                    return dist_a < dist_b;
-               });
- 
+               });*/
+      // Trier les frontiers par taille décroissante
+      std::sort(frontiers.begin(), frontiers.end(),
+      [](const frontier_exploration::Frontier& a, const frontier_exploration::Frontier& b) {
+          return a.size > b.size;
+      });
+      for (size_t i = 0; i < frontiers.size(); ++i) {
+        RCLCPP_INFO(logger_, "Frontier %zu: size = %.2f, cost = %.2f", i, frontiers[i].size, frontiers[i].cost);
+      }
      // find non blacklisted frontier
      auto frontier = std::find_if_not(frontiers.begin(), frontiers.end(),
                                       [this](const frontier_exploration::Frontier& f) {
