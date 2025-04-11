@@ -28,8 +28,8 @@ FrontierSearch::searchFrom(geometry_msgs::msg::Point position)
   std::vector<Frontier> frontier_list;
 
   // Sanity check that robot is inside costmap bounds before searching
-  /*unsigned int mx, my;
-  if (!costmap_->worldToMap(position.x, position.y, mx, my)) {
+  unsigned int mx, my;
+  /*if (!costmap_->worldToMap(position.x, position.y, mx, my)) {
     RCLCPP_ERROR(rclcpp::get_logger("FrontierSearch"), "Robot out of costmap "
                                                        "bounds, cannot search "
                                                        "for frontiers");
