@@ -244,9 +244,9 @@ geometry_msgs::msg::Pose Costmap2DClient::getRobotPose() const
                           ex.what());
     return empty_pose;
   } catch (tf2::ExtrapolationException& ex) {
-    RCLCPP_ERROR_THROTTLE(node_.get_logger(), clk, 1000,
+    /*RCLCPP_ERROR_THROTTLE(node_.get_logger(), clk, 1000,
                           "Extrapolation Error looking up robot pose: %s\n",
-                          ex.what());
+                          ex.what());*/
     return empty_pose;
   } catch (tf2::TransformException& ex) {
     RCLCPP_ERROR_THROTTLE(node_.get_logger(), clk, 1000, "Other error: %s\n",
