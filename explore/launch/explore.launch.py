@@ -1,4 +1,4 @@
-import os
+"""import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch_ros.actions import Node
@@ -44,3 +44,62 @@ def generate_launch_description():
     ld.add_action(declare_namespace_argument)
     ld.add_action(node)
     return ld
+"""
+
+import os
+
+from ament_index_python.packages import get_package_share_directory
+from launch_ros.actions import Node
+
+from launch import LaunchDescription
+from launch.actions import DeclareLaunchArgument
+from launch.substitutions import LaunchConfiguration
+
+
+def generate_launch_description():
+    # Déclare les arguments
+    use_sim_time = LaunchConfiguration("use_sim_time")
+    namespace = LaunchConfiguration("namespace")
+    params_file = LaunchConfiguration("params_file")
+
+    declare_use_sim_time_argument = DeclareLaunchArgument(
+        "use_sim_time", default_value="true", description="Use simulation/Gazebo clock"
+    )
+
+    declare_namespace_argument = DeclareLaunchArgument(
+        "namespace",
+        default_value="",
+        description="Namespace for the explore node",
+    )
+
+    declare_params_file = DeclareLaunchArgument(
+        "params_file",
+        default_value=os.path.join(
+            get_package_share_directory("explore_lite"),
+            "config",
+            "params.yaml"
+        ),
+        description="Full path to the YAML config file to use"
+    )
+
+    # Remapping TF si nécessaire
+    remappings = [("/tf", "tf"), ("/tf_static", "tf_static")]
+
+    # Node Explore Lite
+    node = Node(
+        package="explore_lite",
+        executable="explore",
+        name="explore_node",  # ⚠️ do not change
+        namespace=namespace,
+        parameters=[params_file, {"use_sim_time": use_sim_time}],
+        output="screen",
+        remappings=remappings,
+    )
+
+    # Assemble
+    return LaunchDescription([
+        declare_use_sim_time_argument,
+        declare_namespace_argument,
+        declare_params_file,
+        node,
+    ])

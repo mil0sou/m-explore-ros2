@@ -253,10 +253,10 @@ geometry_msgs::msg::Pose Costmap2DClient::getRobotPose() const
                           ex.what());
     return empty_pose;
   }
-  RCLCPP_INFO(node_.get_logger(), "Robot pose: [%.2f, %.2f, %.2f]", 
+  /*RCLCPP_INFO(node_.get_logger(), "Robot pose: [%.2f, %.2f, %.2f]", 
         robot_pose.pose.position.x, 
         robot_pose.pose.position.y, 
-        robot_pose.pose.position.z);
+        robot_pose.pose.position.z);*/
   return robot_pose.pose;
 }
 

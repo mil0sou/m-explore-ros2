@@ -71,7 +71,7 @@
    this->declare_parameter<float>("potential_scale", 1e-3);
    this->declare_parameter<float>("orientation_scale", 0.0);
    this->declare_parameter<float>("gain_scale", 1.0);
-   this->declare_parameter<float>("min_frontier_size", 1.0);  //à modifier 
+   this->declare_parameter<float>("min_frontier_size", 5.0);  //à modifier 
    this->declare_parameter<bool>("return_to_init", true);
  
    this->get_parameter("planner_frequency", planner_frequency_);
@@ -83,7 +83,17 @@
    this->get_parameter("min_frontier_size", min_frontier_size);
    this->get_parameter("return_to_init", return_to_init_);
    this->get_parameter("robot_base_frame", robot_base_frame_);
- 
+   RCLCPP_INFO(this->get_logger(), "⚙️  explore_node parameters loaded:");
+   RCLCPP_INFO(this->get_logger(), "🔁 planner_frequency: %.2f", planner_frequency_);
+   RCLCPP_INFO(this->get_logger(), "⌛ progress_timeout: %.2f", progress_timeout_);
+   RCLCPP_INFO(this->get_logger(), "👁️  visualize: %s", visualize_ ? "true" : "false");
+   RCLCPP_INFO(this->get_logger(), "📈 potential_scale: %.5f", potential_scale_);
+   RCLCPP_INFO(this->get_logger(), "🧭 orientation_scale: %.2f", orientation_scale_);
+   RCLCPP_INFO(this->get_logger(), "💎 gain_scale: %.2f", gain_scale_);
+   RCLCPP_INFO(this->get_logger(), "🚪 min_frontier_size: %.2f", min_frontier_size);
+   RCLCPP_INFO(this->get_logger(), "🏁 return_to_init: %s", return_to_init_ ? "true" : "false");
+   RCLCPP_INFO(this->get_logger(), "🦿 robot_base_frame: %s", robot_base_frame_.c_str());
+   
    progress_timeout_ = timeout;
    move_base_client_ =
        rclcpp_action::create_client<nav2_msgs::action::NavigateToPose>(
@@ -142,10 +152,10 @@
    }
    */
    if (return_to_init_) {
-     RCLCPP_INFO(logger_, "Getting initial pose of the robot");
+     //RCLCPP_INFO(logger_, "Getting initial pose of the robot");
  
-     RCLCPP_INFO(logger_, "MILO TEST MILO TEST");
-     RCLCPP_INFO(logger_, "searching transform from %s", robot_base_frame_.c_str());
+     //RCLCPP_INFO(logger_, "MILO TEST MILO TEST");
+     //RCLCPP_INFO(logger_, "searching transform from %s", robot_base_frame_.c_str());
      
      geometry_msgs::msg::TransformStamped transformStamped;
      std::string map_frame = costmap_client_.getGlobalFrameID();
@@ -160,7 +170,7 @@
          initial_pose_.position.y = transformStamped.transform.translation.y;
          initial_pose_.orientation = transformStamped.transform.rotation;
  
-         RCLCPP_INFO(logger_, "Transform found from %s to %s", map_frame.c_str(), robot_base_frame_.c_str());
+         //RCLCPP_INFO(logger_, "Transform found from %s to %s", map_frame.c_str(), robot_base_frame_.c_str());
      } catch (tf2::TransformException& ex) {
          RCLCPP_ERROR(logger_, "Couldn't find transform from %s to %s: %s",
                       map_frame.c_str(), robot_base_frame_.c_str(), ex.what());
@@ -207,7 +217,7 @@
    green.b = 0;
    green.a = 1.0;
  
-   RCLCPP_INFO(logger_, "visualising %lu frontiers", frontiers.size());
+   //RCLCPP_INFO(logger_, "visualising %lu frontiers", frontiers.size());
    visualization_msgs::msg::MarkerArray markers_msg;
    std::vector<visualization_msgs::msg::Marker>& markers = markers_msg.markers;
    visualization_msgs::msg::Marker m;
@@ -374,13 +384,13 @@
 
  void Explore::makePlan()
  {
-     RCLCPP_INFO(logger_, "\nMILO TEST MAKEPLAN ");
+     //RCLCPP_INFO(logger_, "\nMILO TEST MAKEPLAN ");
  
      // find frontiers
      auto pose = costmap_client_.getRobotPose();
      // get frontiers sorted according to cost
      auto frontiers = search_.searchFrom(pose.position);
-     RCLCPP_INFO(logger_, "found %lu frontiers", frontiers.size());
+     //RCLCPP_INFO(logger_, "found %lu frontiers", frontiers.size());
      for (size_t i = 0; i < frontiers.size(); ++i) {
          RCLCPP_DEBUG(logger_, "frontier %zd cost: %f", i, frontiers[i].cost);
      }
@@ -438,7 +448,7 @@
          return;
      }
  
-     RCLCPP_INFO(logger_, "Sending goal to move base nav2");
+     //RCLCPP_INFO(logger_, "Sending goal to move base nav2");
  
      // send goal to move_base if we have something new to pursue
      auto goal = nav2_msgs::action::NavigateToPose::Goal();
@@ -446,20 +456,20 @@
      goal.pose.pose.orientation.w = 1.;
      goal.pose.header.frame_id = costmap_client_.getGlobalFrameID();
      goal.pose.header.stamp = this->now();
-     RCLCPP_INFO(logger_, "New goal: x = %f, y = %f", target_position.x, target_position.y);
+     //RCLCPP_INFO(logger_, "New goal: x = %f, y = %f", target_position.x, target_position.y);
      auto send_goal_options = rclcpp_action::Client<nav2_msgs::action::NavigateToPose>::SendGoalOptions();
      send_goal_options.result_callback = [this, target_position](const NavigationGoalHandle::WrappedResult& result) {
          reachedGoal(result, target_position);
      };
      move_base_client_->async_send_goal(goal, send_goal_options);
-     RCLCPP_INFO(logger_, "Goal sent: x = %f, y = %f",goal.pose.pose.position.x, goal.pose.pose.position.y);
+     //RCLCPP_INFO(logger_, "Goal sent: x = %f, y = %f",goal.pose.pose.position.x, goal.pose.pose.position.y);
       // Publish the target position to the "milopose" topic
       std_msgs::msg::String milopose_msg;
       std::stringstream stream;
       stream << std::fixed << std::setprecision(2) << goal.pose.pose.position.x << ";" << goal.pose.pose.position.y;
       milopose_msg.data = stream.str();
       milopose_publisher_->publish(milopose_msg);
-      RCLCPP_INFO(logger_, "Published milopose: %s", milopose_msg.data.c_str());
+      //RCLCPP_INFO(logger_, "Published milopose: %s", milopose_msg.data.c_str());
  }
 
 
@@ -510,14 +520,14 @@
        RCLCPP_INFO(logger_, "Goal was successful");
        break;
      case rclcpp_action::ResultCode::ABORTED:
-       RCLCPP_INFO(logger_, "Goal was NOT aborted");
+       //RCLCPP_INFO(logger_, "Goal was NOT aborted");
        //frontier_blacklist_.push_back(frontier_goal);
-       RCLCPP_INFO(logger_, "NOT Adding current goal to black list");
+       //RCLCPP_INFO(logger_, "NOT Adding current goal to black list");
        // If it was aborted probably because we've found another frontier goal,
        // so just return and don't make plan again
        return;
      case rclcpp_action::ResultCode::CANCELED:
-       RCLCPP_INFO(logger_, "Goal was canceled");
+       //RCLCPP_INFO(logger_, "Goal was canceled");
        // If goal canceled might be because exploration stopped from topic. Don't make new plan.
        return;
      default:
