@@ -83,16 +83,16 @@
    this->get_parameter("min_frontier_size", min_frontier_size);
    this->get_parameter("return_to_init", return_to_init_);
    this->get_parameter("robot_base_frame", robot_base_frame_);
-   RCLCPP_INFO(this->get_logger(), "⚙️  explore_node parameters loaded:");
-   RCLCPP_INFO(this->get_logger(), "🔁 planner_frequency: %.2f", planner_frequency_);
-   RCLCPP_INFO(this->get_logger(), "⌛ progress_timeout: %.2f", progress_timeout_);
-   RCLCPP_INFO(this->get_logger(), "👁️  visualize: %s", visualize_ ? "true" : "false");
-   RCLCPP_INFO(this->get_logger(), "📈 potential_scale: %.5f", potential_scale_);
-   RCLCPP_INFO(this->get_logger(), "🧭 orientation_scale: %.2f", orientation_scale_);
-   RCLCPP_INFO(this->get_logger(), "💎 gain_scale: %.2f", gain_scale_);
-   RCLCPP_INFO(this->get_logger(), "🚪 min_frontier_size: %.2f", min_frontier_size);
-   RCLCPP_INFO(this->get_logger(), "🏁 return_to_init: %s", return_to_init_ ? "true" : "false");
-   RCLCPP_INFO(this->get_logger(), "🦿 robot_base_frame: %s", robot_base_frame_.c_str());
+   RCLCPP_INFO(this->get_logger(), "explore_node parameters loaded:");
+   RCLCPP_INFO(this->get_logger(), "planner_frequency: %.2f", planner_frequency_);
+   RCLCPP_INFO(this->get_logger(), "progress_timeout: %.2f", progress_timeout_);
+   RCLCPP_INFO(this->get_logger(), "visualize: %s", visualize_ ? "true" : "false");
+   RCLCPP_INFO(this->get_logger(), "potential_scale: %.5f", potential_scale_);
+   RCLCPP_INFO(this->get_logger(), "orientation_scale: %.2f", orientation_scale_);
+   RCLCPP_INFO(this->get_logger(), "gain_scale: %.2f", gain_scale_);
+   RCLCPP_INFO(this->get_logger(), "min_frontier_size: %.2f", min_frontier_size);
+   RCLCPP_INFO(this->get_logger(), "return_to_init: %s", return_to_init_ ? "true" : "false");
+   RCLCPP_INFO(this->get_logger(), "robot_base_frame: %s", robot_base_frame_.c_str());
    
    progress_timeout_ = timeout;
    move_base_client_ =
