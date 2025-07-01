@@ -250,7 +250,7 @@
    m.action = visualization_msgs::msg::Marker::ADD;
    size_t id = 0;
    for (auto& frontier : frontiers) {
-     m.type = visualization_msgs::msg::Marker::POINTS;
+     /*m.type = visualization_msgs::msg::Marker::POINTS;
      m.id = int(id);
      // m.pose.position = {}; // compile warning
      m.scale.x = 0.1;
@@ -263,7 +263,7 @@
        m.color = blue;
      }
      markers.push_back(m);
-     ++id;
+     ++id;*/
      m.type = visualization_msgs::msg::Marker::SPHERE;
      m.id = int(id);
      m.pose.position = frontier.initial;
@@ -384,13 +384,13 @@
 
  void Explore::makePlan()
  {
-     //RCLCPP_INFO(logger_, "\nMILO TEST MAKEPLAN ");
+     RCLCPP_INFO(logger_, "\nMILO TEST MAKEPLAN ");
  
      // find frontiers
      auto pose = costmap_client_.getRobotPose();
      // get frontiers sorted according to cost
      auto frontiers = search_.searchFrom(pose.position);
-     //RCLCPP_INFO(logger_, "found %lu frontiers", frontiers.size());
+     RCLCPP_INFO(logger_, "found %lu frontiers", frontiers.size());
      for (size_t i = 0; i < frontiers.size(); ++i) {
          RCLCPP_DEBUG(logger_, "frontier %zd cost: %f", i, frontiers[i].cost);
      }
@@ -456,20 +456,20 @@
      goal.pose.pose.orientation.w = 1.;
      goal.pose.header.frame_id = costmap_client_.getGlobalFrameID();
      goal.pose.header.stamp = this->now();
-     //RCLCPP_INFO(logger_, "New goal: x = %f, y = %f", target_position.x, target_position.y);
+     RCLCPP_INFO(logger_, "New goal: x = %f, y = %f", target_position.x, target_position.y);
      auto send_goal_options = rclcpp_action::Client<nav2_msgs::action::NavigateToPose>::SendGoalOptions();
      send_goal_options.result_callback = [this, target_position](const NavigationGoalHandle::WrappedResult& result) {
          reachedGoal(result, target_position);
      };
      move_base_client_->async_send_goal(goal, send_goal_options);
-     //RCLCPP_INFO(logger_, "Goal sent: x = %f, y = %f",goal.pose.pose.position.x, goal.pose.pose.position.y);
+     RCLCPP_INFO(logger_, "Goal sent: x = %f, y = %f",goal.pose.pose.position.x, goal.pose.pose.position.y);
       // Publish the target position to the "milopose" topic
       std_msgs::msg::String milopose_msg;
       std::stringstream stream;
       stream << std::fixed << std::setprecision(2) << goal.pose.pose.position.x << ";" << goal.pose.pose.position.y;
       milopose_msg.data = stream.str();
       milopose_publisher_->publish(milopose_msg);
-      //RCLCPP_INFO(logger_, "Published milopose: %s", milopose_msg.data.c_str());
+      RCLCPP_INFO(logger_, "Published milopose: %s", milopose_msg.data.c_str());
  }
 
 
@@ -520,14 +520,14 @@
        RCLCPP_INFO(logger_, "Goal was successful");
        break;
      case rclcpp_action::ResultCode::ABORTED:
-       //RCLCPP_INFO(logger_, "Goal was NOT aborted");
+       RCLCPP_INFO(logger_, "Goal was NOT aborted");
        //frontier_blacklist_.push_back(frontier_goal);
        //RCLCPP_INFO(logger_, "NOT Adding current goal to black list");
        // If it was aborted probably because we've found another frontier goal,
        // so just return and don't make plan again
        return;
      case rclcpp_action::ResultCode::CANCELED:
-       //RCLCPP_INFO(logger_, "Goal was canceled");
+       RCLCPP_INFO(logger_, "Goal was canceled");
        // If goal canceled might be because exploration stopped from topic. Don't make new plan.
        return;
      default:
