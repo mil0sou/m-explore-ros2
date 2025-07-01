@@ -24,6 +24,10 @@
         "vector": "cpp",
         "functional": "cpp",
         "chrono": "cpp",
-        "__locale": "cpp"
+        "__locale": "cpp",
+        "any": "cpp",
+        "__node_handle": "cpp",
+        "filesystem": "cpp",
+        "forward_list": "cpp"
     }
 }

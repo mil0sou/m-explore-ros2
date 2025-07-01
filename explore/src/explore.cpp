@@ -396,11 +396,11 @@
      }
  
      if (frontiers.empty()) {
-         RCLCPP_WARN(logger_, "No frontiers found, stopping.");
-         stop(true);
+         RCLCPP_WARN(logger_, "No frontiers found... ehh 2e essai");
+         /*stop(true);
          rclcpp::shutdown();
          exit(0);
-         return;
+         return;*/
      }
  
      // publish frontiers as visualization markers
