@@ -110,7 +110,7 @@ private:
 
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr
       marker_array_publisher_;
-  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr milopose_publisher_;
+  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr goal_pose_publisher_;
   rclcpp::Logger logger_ = rclcpp::get_logger("ExploreNode");
   tf2_ros::Buffer tf_buffer_;
   tf2_ros::TransformListener tf_listener_;

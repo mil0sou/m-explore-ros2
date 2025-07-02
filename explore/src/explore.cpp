@@ -36,9 +36,9 @@
  *
  *********************************************************************/
 
- #include <explore/explore.h>
- #include "rclcpp/time.hpp"  // Assure-toi que cette bibliothèque est incluse
- #include "rclcpp/rclcpp.hpp"
+#include <explore/explore.h>
+#include "rclcpp/time.hpp"  // Assure-toi que cette bibliothèque est incluse
+#include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
 #include <string>
 
@@ -110,14 +110,14 @@
                                                                       "s",
                                                                       10);
    }
-  // Publisher to publish strings to the "milopose" topic
-  milopose_publisher_ = this->create_publisher<std_msgs::msg::String>("milopose", 10);
+  // Publisher to publish strings to the "goal_pose" topic
+  goal_pose_publisher_ = this->create_publisher<std_msgs::msg::String>("goal_pose", 10);
 
   // Publier un message initial pour s'assurer que le topic est visible
   std_msgs::msg::String initial_msg;
   initial_msg.data = "Initial message";
-  milopose_publisher_->publish(initial_msg);
-  RCLCPP_INFO(logger_, "Published initial message on milopose: %s", initial_msg.data.c_str());
+  goal_pose_publisher_->publish(initial_msg);
+  RCLCPP_INFO(logger_, "Published initial message on goal_pose: %s", initial_msg.data.c_str());
 
    // Subscription to resume or stop exploration
    resume_subscription_ = this->create_subscription<std_msgs::msg::Bool>(
@@ -463,13 +463,13 @@
      };
      move_base_client_->async_send_goal(goal, send_goal_options);
      RCLCPP_INFO(logger_, "Goal sent: x = %f, y = %f",goal.pose.pose.position.x, goal.pose.pose.position.y);
-      // Publish the target position to the "milopose" topic
-      std_msgs::msg::String milopose_msg;
+      // Publish the target position to the "goal_pose" topic
+      std_msgs::msg::String goal_pose_msg;
       std::stringstream stream;
       stream << std::fixed << std::setprecision(2) << goal.pose.pose.position.x << ";" << goal.pose.pose.position.y;
-      milopose_msg.data = stream.str();
-      milopose_publisher_->publish(milopose_msg);
-      RCLCPP_INFO(logger_, "Published milopose: %s", milopose_msg.data.c_str());
+      goal_pose_msg.data = stream.str();
+      goal_pose_publisher_->publish(goal_pose_msg);
+      RCLCPP_INFO(logger_, "Published goal_pose: %s", goal_pose_msg.data.c_str());
  }
 
 
@@ -486,13 +486,13 @@
        rclcpp_action::Client<nav2_msgs::action::NavigateToPose>::SendGoalOptions();
    move_base_client_->async_send_goal(goal, send_goal_options);
    RCLCPP_INFO(logger_, "Returning to initial pose: x = %f, y = %f", goal.pose.pose.position.x, goal.pose.pose.position.y);
-    // Publish the target position to the "milopose" topic
-    std_msgs::msg::String milopose_msg;
+    // Publish the target position to the "goal_pose" topic
+    std_msgs::msg::String goal_pose_msg;
     std::stringstream stream;
     stream << std::fixed << std::setprecision(2) << goal.pose.pose.position.x << ";" << goal.pose.pose.position.y;
-    milopose_msg.data = stream.str();
-    milopose_publisher_->publish(milopose_msg);
-    RCLCPP_INFO(logger_, "Published milopose: %s", milopose_msg.data.c_str());
+    goal_pose_msg.data = stream.str();
+    goal_pose_publisher_->publish(goal_pose_msg);
+    RCLCPP_INFO(logger_, "Published goal_pose: %s", goal_pose_msg.data.c_str());
   }
  
  bool Explore::goalOnBlacklist(const geometry_msgs::msg::Point& goal)
