@@ -392,11 +392,11 @@
      auto frontiers = search_.searchFrom(pose.position);
      RCLCPP_INFO(logger_, "found %lu frontiers", frontiers.size());
      for (size_t i = 0; i < frontiers.size(); ++i) {
-         RCLCPP_DEBUG(logger_, "frontier %zd cost: %f", i, frontiers[i].cost);
+         RCLCPP_INFO(logger_, "frontier %zd cost: %f", i, frontiers[i].cost);
      }
  
      if (frontiers.empty()) {
-         RCLCPP_WARN(logger_, "No frontiers found... ehh 2e essai");
+         RCLCPP_WARN(logger_, "No frontiers found... 2e essai");
          /*stop(true);
          rclcpp::shutdown();
          exit(0);
